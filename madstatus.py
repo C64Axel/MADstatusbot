@@ -108,7 +108,6 @@ def check_action(wait,tgcorrelation,action):
 
 	lasttodo = {}
 	while True:
-		log("performing actions")
 		status = get_status()
 
 		for instance in status:
@@ -166,7 +165,11 @@ def handle_status(message):
 	try:
 		chat_devices = message.text.split(" ")[1]
 	except:
-		chat_devices = config['tgcorrelation'][str(chat_id)]['box_origin']
+		try:
+			chat_devices = config['tgcorrelation'][str(chat_id)]['box_origin']
+		except:
+			sendtelegram(chat_id,msg_loc["3"])
+			return
 
 	status = get_status()
 
