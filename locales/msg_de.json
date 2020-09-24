@@ -1,0 +1,4 @@
+{
+	"1" : "``` Device     Zeit     Route```\n",
+	"2" : "Deine Box {} hat sich seit {:.0f} minuten nicht mehr gemeldet und benötigt einen Restart"
+}

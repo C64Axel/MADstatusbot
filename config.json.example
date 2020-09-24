@@ -1,0 +1,22 @@
+{
+	"apitoken": "<APITOKEN>",
+	"madmin_url" : ["<USER>:<PASSWORD>@http://127.0.0.1:5050"],
+	"oktimeout" : 20,
+	"language" : "de",
+	"actionwait" : 60,
+	"tgcorrelation": {
+			"<CHATID>": {
+				"name": "<NAME>",
+				"box_origin": "all,<ORIGIN1>,<ORIGIN2>"
+				}
+			},
+	"action": {
+			"<ORIGIN1>": {
+				"25": "MADREBOOT",
+				"35": "MSG"
+				},
+			"<ORIGIN2>": {
+				"20": "MSG"
+				}
+			}
+}
