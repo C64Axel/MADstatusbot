@@ -1,23 +1,22 @@
 {
 	"apitoken": "<APITOKEN>",
-	"madmin_url" : ["<user>:<password>@http://127.0.0.1:5050"],
+	"madmin_url" : ["<USER>:<PASSWORD>@http://127.0.0.1:5050"],
 	"oktimeout" : 20,
 	"language" : "de",
 	"actionwait" : 60,
 	"tgcorrelation": {
 			"<CHATID>": {
 				"name": "<NAME>",
-				"box_origin": "all,atvxxx1,atvxxx2"
+				"box_origin": "all,<ORIGIN1>,<ORIGIN2>"
 				}
 			},
 	"action": {
-			"atvxxx1": {
-				"timeout": [25,35],
-				"todo": ["MADREBOOT","MSG"]
+			"<ORIGIN1>": {
+				"25": "MADREBOOT",
+				"35": "MSG"
 				},
-			"atvxxx2": {
-				"timeout": [20],
-				"todo": ["MSG"]
+			"<ORIGIN2>": {
+				"20": "MSG"
 				}
 			}
 }

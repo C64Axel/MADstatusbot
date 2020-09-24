@@ -68,7 +68,7 @@ telebot.apihelper.ENABLE_MIDDLEWARE = True
 
 @bot.middleware_handler(update_types=['message'])
 def log_message(bot_instance, message):
-	log("Message from ID:" + str(message.from_user.id) + ":" + str(message.from_user.username) + ":" + str(message.text))
+	log("Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
 
 ##################
 # Get Status from Server
@@ -84,13 +84,28 @@ def get_status():
 			r.sort(key=get_name)
 			status.append(r)
 		except:
-			log("Error getting " + madmin_url)
+			log("Error getting {}".format(madmin_url))
 
 	return status
 
 ##################
-# Actions
-def check_action(wait,action):
+# check for Actions
+def check_action(wait,tgcorrelation,action):
+
+	#################
+	# MSG
+	def MSG(origin,diff,tgcorrelation):
+		for chatid in tgcorrelation:
+			msg_out = msg_loc["2"].format(origin,str(datetime.timedelta(seconds=diff)))
+			log("Send message for {} to {}".format(origin,chatid))
+			sendtelegram(chatid,msg_out)
+
+	##################
+	# MADREBOOT
+	def MADREBOOT():
+		log("MADREBOOT")
+
+	lasttodo = {}
 	while True:
 		log("performing actions")
 		status = get_status()
@@ -102,24 +117,35 @@ def check_action(wait,action):
 
 					try:						# set last action counter
 											# reset if last action sucsessfull
-						if diff < action[origin['name']]['timeout'][0]:
-							action[origin['name']]['last_todo'] = 0
+						if diff < lasttodo[origin['name']]:
+							lasttodo[origin['name']] = 0
 
-						last_todo = action[origin['name']]['last_todo']
-						
+						last_todo = lasttodo[origin['name']]
 					except:
 						last_todo = 0
-						action[origin['name']]['last_todo'] = last_todo
 						try:					# set last action after restart bot
-							while diff > action[origin['name']]['timeout'][last_todo + 1]:
-								last_todo = last_todo + 1
+							while diff >= int(list(action[origin['name']].keys())[last_todo + 1]):
+								last_todo += 1
 						except:
 							pass
 
+						lasttodo[origin['name']] = last_todo
+
 					try:
-						if diff > action[origin['name']]['timeout'][last_todo]:
-							log("Action:{}:{:.0f}:{}".format(origin['name'],diff,action[origin['name']]['todo'][last_todo]))
-							action[origin['name']]['last_todo'] = last_todo + 1
+						timeout = int(list(action[origin['name']].keys())[last_todo])
+						todo = list(action[origin['name']].values())[last_todo]
+
+						if diff >= timeout:
+							log("Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))
+
+							if todo.upper() == "MSG":
+								MSG(origin['name'],diff,tgcorrelation)
+							elif todo.upper() == "MADREBOOT":
+								MADREBOOT()
+							else:
+								log("wrong action in {}".format(origin['name']))
+
+							lasttodo[origin['name']] += 1
 					except:
 						log("Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
 
@@ -157,7 +183,7 @@ def handle_status(message):
 ####################################################################
 log("Bot {} started".format(botname))
 
-t = Thread(target=check_action, args=(int(config['actionwait']),config['action']))
+t = Thread(target=check_action, args=(int(config['actionwait']),config['tgcorrelation'],config['action']))
 t.start()
 
 bot.polling()

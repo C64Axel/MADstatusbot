@@ -24,9 +24,8 @@ tgcorrelation : Assign one chatid to one or multiple Oringins in MAD.
                 If you set this to "all" you get the status from all origins.  
                 "name" is only for your dokumentation and not used by the bot.  
              
-action        : Set multiple timeouts and their todo split by ','  
-                Please set as many todos as timeouts.  
-                timeout : several timeout parameters for the todo's, split by ','  
+action        : Set multiple timeouts and their todo  
+                timeout : n minutes  
                 todo    : todo the bot will do for you if the timeout is reached  
 ```
 
@@ -36,29 +35,28 @@ MSG       : Send a Message to all users who has an correlation to this origin.
 MADREBOOT : Try a reboot with madadmin  
 ```
 
-Example:
+Example:  
 
 ```
 {
         "apitoken": "<APITOKEN>",
-        "madmin_url" : ["<user>:<password>@http://127.0.0.1:5050"],
+        "madmin_url" : ["<USER>:<PASSWORD>@http://127.0.0.1:5050"],
         "oktimeout" : 20,
         "language" : "de",
         "actionwait" : 60,
         "tgcorrelation": {
                         "<CHATID>": {
                                 "name": "<NAME>",
-                                "box_origin": "all,atvxxx1,atvxxx2"
+                                "box_origin": "all,<ORIGIN1>,<ORIGIN2>......."
                                 }
                         },
         "action": {
-                        "atvxxx1": {
-                                "timeout": [25,35],
-                                "todo": ["MADREBOOT","MSG"]
+                        "<ORIGIN1>": {
+                                "25": "MADREBOOT",
+                                "35": "MSG"
                                 },
-                        "atvxxx2": {
-                                "timeout": [20],
-                                "todo": ["MSG"]
+                        "<ORIGIN2>": {
+                                "20": "MSG"
                                 }
                         }
 }
