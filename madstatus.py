@@ -96,9 +96,10 @@ def check_action(wait,tgcorrelation,action):
 	# MSG
 	def MSG(origin,diff,tgcorrelation):
 		for chatid in tgcorrelation:
-			msg_out = msg_loc["2"].format(origin,diff)
-			log("Send message for {} to {}".format(origin,chatid))
-			sendtelegram(chatid,msg_out)
+			if origin in tgcorrelation[chatid]['box_origin']:
+				msg_out = msg_loc["2"].format(origin,diff)
+				log("Send message for {} to {}".format(origin,chatid))
+				sendtelegram(chatid,msg_out)
 
 	##################
 	# MADREBOOT
