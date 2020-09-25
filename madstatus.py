@@ -113,6 +113,11 @@ def check_action(wait,tgcorrelation,action):
 		for instance in status:
 			for origin in instance:
 				if origin['name'] in action:
+					boxname = origin['name']
+				else:
+					boxname = "global"
+
+				if boxname in action:
 					diff = int((time.mktime(time.localtime()) - origin['lastProtoDateTime']))/60
 
 					try:						# set last action counter
@@ -132,8 +137,8 @@ def check_action(wait,tgcorrelation,action):
 						lasttodo[origin['name']] = last_todo
 
 					try:
-						timeout = int(list(action[origin['name']].keys())[last_todo])
-						todo = list(action[origin['name']].values())[last_todo]
+						timeout = int(list(action[boxname].keys())[last_todo])
+						todo = list(action[boxname].values())[last_todo]
 
 						if diff >= timeout:
 							log("Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))

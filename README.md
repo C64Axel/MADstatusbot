@@ -24,7 +24,8 @@ tgcorrelation : Assign one chatid to one or multiple Oringins in MAD.
                 If you set this to "all" you get the status from all origins.  
                 "name" is only for your dokumentation and not used by the bot.  
              
-action        : Set multiple timeouts and their todo  
+action        : Set multiple timeouts and their todo (please have a look at the example below )  
+                global  : this action is for origins with no special action entry  
                 timeout : n minutes  
                 todo    : todo the bot will do for you if the timeout is reached  
 ```
@@ -51,6 +52,9 @@ Example:
                                 }
                         },
         "action": {
+                        "global": {
+                                "60": "MSG"
+                                },
                         "<ORIGIN1>": {
                                 "25": "MADREBOOT",
                                 "35": "MSG"
