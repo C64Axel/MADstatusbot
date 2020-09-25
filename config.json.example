@@ -11,6 +11,9 @@
 				}
 			},
 	"action": {
+			"global": {
+				"60": "MSG"
+				},
 			"<ORIGIN1>": {
 				"25": "MADREBOOT",
 				"35": "MSG"
