@@ -47,6 +47,9 @@ except:
         log("Error in Telegram. Can not find Botname and ID")
         quit()
 
+telebot.apihelper.ENABLE_MIDDLEWARE = True
+telebot.apihelper.RETRY_ON_ERROR  = True
+
 ##################
 #
 def sendtelegram(chatid,msg):
@@ -64,8 +67,6 @@ def get_name(status):
 
 ##################
 # do some logging
-telebot.apihelper.ENABLE_MIDDLEWARE = True
-
 @bot.middleware_handler(update_types=['message'])
 def log_message(bot_instance, message):
 	log("Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
