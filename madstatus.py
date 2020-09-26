@@ -61,11 +61,6 @@ def sendtelegram(chatid,msg):
                 log ("ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
 
 ##################
-# Sort by name
-def get_name(status):
-        return status.get('name')
-
-##################
 # do some logging
 @bot.middleware_handler(update_types=['message'])
 def log_message(bot_instance, message):
@@ -74,6 +69,12 @@ def log_message(bot_instance, message):
 ##################
 # Get Status from Server
 def get_status():
+
+	##################
+	# Sort by name
+	def get_name(status):
+		return status.get('name')
+
 	status = []
 
 	for url in config['madmin_url']:
@@ -105,7 +106,7 @@ def check_action(wait,tgcorrelation,action):
 	##################
 	# MADREBOOT
 	def MADREBOOT():
-		log("MADREBOOT")
+		pass
 
 	lasttodo = {}
 	while True:
@@ -121,25 +122,25 @@ def check_action(wait,tgcorrelation,action):
 				if boxname in action:
 					diff = int((time.mktime(time.localtime()) - origin['lastProtoDateTime']))/60
 
-					try:						# set last action counter
 											# reset if last action sucsessfull
-						if diff < lasttodo[origin['name']]:
-							lasttodo[origin['name']] = 0
+					if diff < int(list(action[boxname].keys())[0]):
+						lasttodo[origin['name']] = 0
 
+					try:						# try to read last todo index
 						last_todo = lasttodo[origin['name']]
-					except:
+					except:						# restart: set last action for origin
 						last_todo = 0
-						try:					# set last action after restart bot
-							while diff >= int(list(action[origin['name']].keys())[last_todo + 1]):
+						try:
+							while diff >= int(list(action[boxname].keys())[last_todo + 1]):
 								last_todo += 1
 						except:
 							pass
-
 						lasttodo[origin['name']] = last_todo
 
-					try:
+					try:						# send message if not last action
 						timeout = int(list(action[boxname].keys())[last_todo])
 						todo = list(action[boxname].values())[last_todo]
+
 
 						if diff >= timeout:
 							log("Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))
