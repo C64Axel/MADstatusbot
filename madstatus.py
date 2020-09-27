@@ -103,15 +103,20 @@ def check_action(wait,tgcorrelation,action):
 				sendtelegram(chatid,msg_out)
 
 	##################
-	# MADREBOOT
-	def MADREBOOT():
-		pass
+	# MADURL
+	def MADURL(origin,instance,url):
+		madmin_up = instance.split("@")[0]
+		madmin_url = instance.split("@")[1]
+
+		url = url.replace("<ORIGIN>",origin)
+		r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False)
+
 
 	lasttodo = {}
 	while True:
 		status = get_status()
 
-		for instance in status:
+		for instancekey, instance in enumerate(status):
 			for origin in instance:
 				if origin['name'] in action:
 					boxname = origin['name']
@@ -138,16 +143,17 @@ def check_action(wait,tgcorrelation,action):
 
 					try:						# send message if not last action
 						timeout = int(list(action[boxname].keys())[last_todo])
-						todo = list(action[boxname].values())[last_todo]
-
 
 						if diff >= timeout:
+							todo = list(action[boxname].values())[last_todo].upper().split(":")[0]
+
 							log("Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))
 
-							if todo.upper() == "MSG":
+							if todo == "MSG":
 								MSG(origin['name'],diff,tgcorrelation)
-							elif todo.upper() == "MADREBOOT":
-								MADREBOOT()
+							elif todo == "MADURL":
+								url = list(action[boxname].values())[last_todo].split(":")[1]
+								MADURL(origin['name'],config['madmin_url'][instancekey],url)
 							else:
 								log("wrong action in {}".format(origin['name']))
 
