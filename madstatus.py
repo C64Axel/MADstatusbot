@@ -48,7 +48,6 @@ except:
         quit()
 
 telebot.apihelper.ENABLE_MIDDLEWARE = True
-telebot.apihelper.RETRY_ON_ERROR  = True
 
 ##################
 #
@@ -197,5 +196,5 @@ log("Bot {} started".format(botname))
 t = Thread(target=check_action, args=(int(config['actionwait']),config['tgcorrelation'],config['action']))
 t.start()
 
-bot.polling()
+bot.polling(none_stop=True)
 
