@@ -32,8 +32,12 @@ action        : Set multiple timeouts and their todo (please have a look at the 
 
 ## Actions:
 ```
-MSG       : Send a Message to all users who has an correlation to this origin.  
-MADREBOOT : Try a reboot with madadmin  
+MSG      : Send a Message to all users who has an correlation to this origin.  
+MADURL   : Send this URL to the madmin instance. Replace <ORIGIN> whit the origin name
+           Example:
+           "MADURL:/restart_phone?origin=<ORIGIN>&adb=False"  -> reboot the origin
+           "MADURL:/clear_game_data?origin=<ORIGIN>&adb=False"  -> clear PoGo game data
+           "MADURL:/install_file?jobname=Reboot-Device&origin=<ORIGIN>&adb=False&type=JobType.CHAIN"  -> start Job reboot for the origin
 ```
 
 Example:  
@@ -56,7 +60,7 @@ Example:
                                 "60": "MSG"
                                 },
                         "<ORIGIN1>": {
-                                "25": "MADREBOOT",
+                                "25": "MADURL:/restart_phone?origin=<ORIGIN>&adb=False",
                                 "35": "MSG"
                                 },
                         "<ORIGIN2>": {
