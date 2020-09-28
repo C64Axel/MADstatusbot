@@ -6,10 +6,11 @@ import io
 import time
 import requests
 import datetime
+import threading
 
 from time import sleep
 from urllib3.exceptions import InsecureRequestWarning
-from threading import Thread
+from threading import Thread,currentThread
 
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
@@ -20,6 +21,7 @@ def my_excepthook(excType, excValue, traceback, logger=logging):
     logging.error("Logging an uncaught exception",
                  exc_info=(excType, excValue, traceback))
 sys.excepthook = my_excepthook
+threading.excepthook = my_excepthook
 
 def log(msg):
         print (msg)
@@ -27,17 +29,14 @@ def log(msg):
         logging.info(msg)
 
 ##################
-#read config
+#read config,locales
 with open ('config.json') as config_file:
 	config = json.load(config_file)
-
-##################
-#read locales
 msg_loc = json.load(open("locales/msg_" + config['language'] + ".json"))
 
 ##################
 # get bot information
-bot = telebot.TeleBot(config['apitoken'])
+bot = telebot.TeleBot(config['apitoken'],threaded=False)
 try:
         botident = bot.get_me()
         botname = botident.username
@@ -114,6 +113,7 @@ def check_action(wait,tgcorrelation,action):
 
 	lasttodo = {}
 	while True:
+
 		status = get_status()
 
 		for instancekey, instance in enumerate(status):
@@ -128,6 +128,7 @@ def check_action(wait,tgcorrelation,action):
 
 											# reset if last action sucsessfull
 					if diff < int(list(action[boxname].keys())[0]):
+#						log("{} set status to normal".format(origin['name']))
 						lasttodo[origin['name']] = 0
 
 					try:						# try to read last todo index
@@ -162,7 +163,6 @@ def check_action(wait,tgcorrelation,action):
 						log("Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
 
 		sleep(wait)
-	
 
 ##################
 # Handle status
@@ -197,10 +197,13 @@ def handle_status(message):
 	sendtelegram(chat_id,msg_out)
 
 ####################################################################
-log("Bot {} started".format(botname))
 
+log("Bot {} started".format(botname))
 t = Thread(target=check_action, args=(int(config['actionwait']),config['tgcorrelation'],config['action']))
+t.setDaemon(True)
 t.start()
 
-bot.polling(none_stop=True)
+while True:
+	bot.polling(none_stop = False)
+	log("Bot {} restarted".format(botname))
 
