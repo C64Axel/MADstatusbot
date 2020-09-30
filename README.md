@@ -20,8 +20,9 @@ language   : Language of user messages
 actionwait : Waiting time between checks  
 
 tgcorrelation : Assign one chatid to one or multiple Oringins in MAD.  
-                Only this chatid can query the Status and get Messages from this origin.  
-                If you set this to "all" you get the status from all origins.  
+                Only this chatid can query the Status and get Messages from the origins listet in box_origin.  
+                If you set this to "all" you get status from all origins.  
+                If you set this to "allmsg" you get messages from all origins.  
                 "name" is only for your dokumentation and not used by the bot.  
              
 action        : Set multiple timeouts and their todo (please have a look at the example below )  
@@ -50,6 +51,10 @@ Example:
         "language" : "de",
         "actionwait" : 60,
         "tgcorrelation": {
+                        "<CHATID>": {
+                                "name": "SuperAdmin",
+                                "box_origin": "all,allmsg"
+                                },
                         "<CHATID>": {
                                 "name": "<NAME>",
                                 "box_origin": "all,<ORIGIN1>,<ORIGIN2>......."
