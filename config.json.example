@@ -6,6 +6,10 @@
 	"actionwait" : 60,
 	"tgcorrelation": {
 			"<CHATID>": {
+				"name": "SuperAdmin",
+				"box_origin": "all,allmsg"
+				},
+			"<CHATID>": {
 				"name": "<NAME>",
 				"box_origin": "all,<ORIGIN1>,<ORIGIN2>"
 				}
@@ -15,7 +19,7 @@
 				"60": "MSG"
 				},
 			"<ORIGIN1>": {
-				"25": "MADREBOOT",
+				"25": "MADURL:/restart_phone?origin=<ORIGIN>&adb=False",
 				"35": "MSG"
 				},
 			"<ORIGIN2>": {

@@ -16,19 +16,6 @@ from threading import Thread,currentThread
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 ##################
-# Logging
-def my_excepthook(excType, excValue, traceback, logger=logging):
-    logging.error("Logging an uncaught exception",
-                 exc_info=(excType, excValue, traceback))
-sys.excepthook = my_excepthook
-threading.excepthook = my_excepthook
-
-def log(msg):
-        print (msg)
-        logging.basicConfig(filename="log/" + botname + ".log", format="%(asctime)s|%(message)s", level=logging.INFO)
-        logging.info(msg)
-
-##################
 #read config,locales
 with open ('config.json') as config_file:
 	config = json.load(config_file)
@@ -46,7 +33,25 @@ except:
         log("Error in Telegram. Can not find Botname and ID")
         quit()
 
+
+##################
+# Logging
+def my_excepthook(excType, excValue, traceback, logger=logging):
+    logging.error("Logging an uncaught exception",
+                 exc_info=(excType, excValue, traceback))
+sys.excepthook = my_excepthook
+threading.excepthook = my_excepthook
+
+def log(msg):
+        print (msg)
+        logging.basicConfig(filename="log/" + botname + ".log", format="%(asctime)s|%(message)s", level=logging.INFO)
+        logging.info(msg)
+
 telebot.apihelper.ENABLE_MIDDLEWARE = True
+@bot.middleware_handler(update_types=['message'])
+def log_message(bot_instance, message):
+	log("Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
+
 
 ##################
 #
@@ -58,11 +63,6 @@ def sendtelegram(chatid,msg):
         except:
                 log ("ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
 
-##################
-# do some logging
-@bot.middleware_handler(update_types=['message'])
-def log_message(bot_instance, message):
-	log("Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
 
 ##################
 # Get Status from Server
@@ -79,14 +79,16 @@ def get_status():
 		madmin_up = url.split("@")[0]
 		madmin_url = url.split("@")[1]
 
-		try:
-			r = requests.get(madmin_url + '/get_status', auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False).json()
+		r = requests.get(madmin_url + '/get_status', auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False)
+		if r.status_code == requests.codes.ok:
+			r = r.json()
 			r.sort(key=get_name)
 			status.append(r)
-		except:
-			log("Error getting {}".format(madmin_url))
+		else:
+			log("Error getting status from {}".format(madmin_url))
 
 	return status
+
 
 ##################
 # check for Actions
@@ -96,7 +98,8 @@ def check_action(wait,tgcorrelation,action):
 	# MSG
 	def MSG(origin,diff,tgcorrelation):
 		for chatid in tgcorrelation:
-			if origin in tgcorrelation[chatid]['box_origin']:
+			chat_devices = tgcorrelation[chatid]['box_origin']
+			if ("allmsg" in chat_devices) or (origin in chat_devices):
 				msg_out = msg_loc["2"].format(origin,diff)
 				log("Send message for {} to {}".format(origin,chatid))
 				sendtelegram(chatid,msg_out)
@@ -109,6 +112,8 @@ def check_action(wait,tgcorrelation,action):
 
 		url = url.replace("<ORIGIN>",origin)
 		r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False)
+		if r.status_code !=  requests.codes.ok:
+			log("Error getting {}".format(madmin_url))
 
 
 	lasttodo = {}
@@ -164,6 +169,7 @@ def check_action(wait,tgcorrelation,action):
 
 		sleep(wait)
 
+
 ##################
 # Handle status
 @bot.message_handler(commands=['status'])
@@ -205,5 +211,4 @@ t.start()
 
 while True:
 	bot.polling(none_stop = False)
-	log("Bot {} restarted".format(botname))
 
