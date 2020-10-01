@@ -24,6 +24,9 @@ tgcorrelation : Assign one chatid to one or multiple Oringins in MAD.
                 If you set this to "all" you get status from all origins.  
                 If you set this to "allmsg" you get messages from all origins.  
                 "name" is only for your dokumentation and not used by the bot.  
+		"verbose" ist optional. Default is False. If set to True this Account get  
+			  more Messages like "MADURL ... startet for device xxxx"  
+			  
              
 action        : Set multiple timeouts and their todo (please have a look at the example below )  
                 global  : this action is for origins with no special action entry  
@@ -53,6 +56,7 @@ Example:
         "tgcorrelation": {
                         "<CHATID>": {
                                 "name": "SuperAdmin",
+				"verbose": "true",
                                 "box_origin": "all,allmsg"
                                 },
                         "<CHATID>": {
@@ -85,3 +89,7 @@ Example:
 ### 21. Sep 2020
 
 Initial Version
+
+### 1. Okt 2020
+
+add verbose, allmsg and some new Messages
