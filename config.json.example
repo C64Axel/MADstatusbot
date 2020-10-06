@@ -25,7 +25,8 @@
 				"35": "MSG"
 				},
 			"<ORIGIN2>": {
-				"20": "MSG"
+				"40": "SCR:/home/mad/utils/boxrestart.sh <ORIGIN>",
+				"60": "MSG"
 				}
 			}
 }

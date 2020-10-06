@@ -42,6 +42,11 @@ MADURL   : Send this URL to the madmin instance. Replace <ORIGIN> whit the origi
            "MADURL:/restart_phone?origin=<ORIGIN>&adb=False"  -> reboot the origin
            "MADURL:/clear_game_data?origin=<ORIGIN>&adb=False"  -> clear PoGo game data
            "MADURL:/install_file?jobname=Reboot-Device&origin=<ORIGIN>&adb=False&type=JobType.CHAIN"  -> start Job reboot for the origin
+SCR      : Execute a script. 
+	   It is better to put complex code in one script.
+	   !!! Beware: An invalid script can damage your whole instance. !!!
+	   Example:
+	   "SCR:/home/mad/utils/boxrestart.sh <ORIGIN>"
 ```
 
 Example:  
@@ -73,7 +78,8 @@ Example:
                                 "35": "MSG"
                                 },
                         "<ORIGIN2>": {
-                                "20": "MSG"
+                                "40": "SCR:/home/mad/utils/boxrestart.sh <ORIGIN>",
+				"60": "MSG"
                                 }
                         }
 }
@@ -93,3 +99,7 @@ Initial Version
 ### 1. Okt 2020
 
 add verbose, allmsg and some new Messages
+
+### 6. Okt 2020
+
+new action SCR
