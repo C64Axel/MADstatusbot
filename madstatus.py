@@ -7,6 +7,8 @@ import time
 import requests
 import datetime
 import threading
+import shlex
+import subprocess
 
 from time import sleep
 from urllib3.exceptions import InsecureRequestWarning
@@ -115,6 +117,12 @@ def check_action(wait,tgcorrelation,action):
 			log("Error getting {}".format(madmin_url))
 		return(r.status_code)
 
+	##################
+	# SCRIPT
+	def SCRIPT(origin,script):
+		script = script.replace("<ORIGIN>",origin)
+		p = subprocess.run(shlex.split(script))
+		log(p)
 
 	lasttodo = {}
 	while True:
@@ -134,17 +142,17 @@ def check_action(wait,tgcorrelation,action):
 											# reset if last action sucsessfull
 					if diff < int(list(action[boxname].keys())[0]) and origin['name'] in lasttodo and lasttodo[origin['name']] > 0:
 						log("{} set status to normal".format(origin['name']))
-						lasttodo[origin['name']] = 0
 						MSG(origin['name'],tgcorrelation,msg_loc["5"].format(origin['name']),False)
+						lasttodo[origin['name']] = 0
 
 					try:						# try to read last todo index
 						last_todo = lasttodo[origin['name']]
-					except:						# restart: set last action for origin
+					except KeyError:				# restart: set last action for origin
 						last_todo = 0
 						try:
 							while diff >= int(list(action[boxname].keys())[last_todo + 1]):
 								last_todo += 1
-						except:
+						except IndexError:
 							pass
 						lasttodo[origin['name']] = last_todo
 
@@ -162,12 +170,18 @@ def check_action(wait,tgcorrelation,action):
 								url = list(action[boxname].values())[last_todo].split(":")[1]
 								MADURL(origin['name'],config['madmin_url'][instancekey],url)
 								MSG(origin['name'],tgcorrelation,msg_loc["4"].format(url,origin['name']),True)
+							elif todo == "SCR":
+								script = list(action[boxname].values())[last_todo].split(":")[1]
+								SCRIPT(origin['name'],script)
+								MSG(origin['name'],tgcorrelation,msg_loc["6"].format(script,origin['name']),True)
 							else:
 								log("wrong action in {}".format(origin['name']))
 
 							lasttodo[origin['name']] += 1
-					except:
+					except IndexError:
 						log("Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
+					except:
+						raise
 
 		sleep(wait)
 
