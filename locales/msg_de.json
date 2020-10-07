@@ -2,7 +2,7 @@
 	"1" : "``` Device     Zeit     Route```\n",
 	"2" : "Deine Box {} hat sich seit {:.0f} minuten nicht mehr gemeldet und benötigt einen Restart.",
 	"3" : "Du bist nicht in der Scannerliste. Bitte wende dich an den Admin.",
-	"4" : "MADURL ```{}``` für Box {} ausgeführt.",
+	"4" : "MADURL ``` {} ``` für Box {} ausgeführt.",
 	"5" : "Status Box {} wieder OK.",
-	"6" : "Script ```{}``` für Box {} ausgeführt."
+	"6" : "Script ``` {} ``` für Box {} ausgeführt."
 }
