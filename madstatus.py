@@ -118,11 +118,11 @@ def check_action(wait,tgcorrelation,action):
 		return(r.status_code)
 
 	##################
-	# SCRIPT
-	def SCRIPT(origin,script):
-		script = script.replace("<ORIGIN>",origin)
-		p = subprocess.run(shlex.split(script))
-		log(p)
+	# CMD
+	def CMD(origin,cmd):
+		cmd = cmd.replace("<ORIGIN>",origin)
+		p = subprocess.run(shlex.split(cmd))
+		log("CMD:{}".format(p))
 
 	lasttodo = {}
 	while True:
@@ -171,9 +171,9 @@ def check_action(wait,tgcorrelation,action):
 								MADURL(origin['name'],config['madmin_url'][instancekey],url)
 								MSG(origin['name'],tgcorrelation,msg_loc["4"].format(url,origin['name']),True)
 							elif todo == "SCR":
-								script = list(action[boxname].values())[last_todo].split(":")[1]
-								SCRIPT(origin['name'],script)
-								MSG(origin['name'],tgcorrelation,msg_loc["6"].format(script,origin['name']),True)
+								cmd = list(action[boxname].values())[last_todo].split(":")[1]
+								CMD(origin['name'],cmd)
+								MSG(origin['name'],tgcorrelation,msg_loc["6"].format(cmd,origin['name']),True)
 							else:
 								log("wrong action in {}".format(origin['name']))
 
