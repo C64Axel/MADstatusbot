@@ -114,7 +114,7 @@ def check_action(wait,tgcorrelation,action):
 		url = url.replace("<ORIGIN>",origin)
 		r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False)
 		if r.status_code !=  requests.codes.ok:
-			log("Error getting {}".format(madmin_url))
+			log("Error sending MADURL:{}:{}".format(madmin_url,r.status_code))
 		return(r.status_code)
 
 	##################

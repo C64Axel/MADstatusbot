@@ -37,7 +37,7 @@ action        : Set multiple timeouts and their todo (please have a look at the 
 ## Actions:
 ```
 MSG      : Send a Message to all users who has an correlation to this origin.  
-MADURL   : Send this URL to the madmin instance. Replace <ORIGIN> whit the origin name
+MADURL   : Send this URL to the madmin instance. The Bot will replace <ORIGIN> whit the origin name.
            Example:
            "MADURL:/restart_phone?origin=<ORIGIN>&adb=False"  -> reboot the origin
            "MADURL:/clear_game_data?origin=<ORIGIN>&adb=False"  -> clear PoGo game data
