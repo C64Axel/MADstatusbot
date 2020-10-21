@@ -7,14 +7,28 @@ Telegram Statusbot for MAD with autoaction
 
 ## Installation Guide:
 
+Clone the git repository.  
+Create a virtual environment and install the requirements:  
 ```
-pip3 install -r requirements.txt
+apt install python-virtualenv
+
+virtualenv -p python3 ~/MADstatusbot_env
+
+cd ~/MADstatusbot
+
+~/MADstatusbot_env/bin/pip install -r requirements.txt
 ```
 
 Create a Telegram Bot.  
-Copy config.json.example to config.json.  
+Copy config.json.example to config.json and do your configurations.  
 
-Set the following parameters:
+Start the bot with  
+```
+cd ~/MADstatusbot
+~/MADstatusbot_env/bin/python madstatus.py
+```
+
+Set the following parameters:  
 
 ```
 apitoken   : The apitoken form your bot  
