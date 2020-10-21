@@ -1,10 +1,14 @@
 # MADstatusbot
 Telegram Statusbot for MAD with autoaction
 
+![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)
+![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)
+![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)
+
 ## Installation Guide:
 
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 Create a Telegram Bot.  
@@ -50,6 +54,7 @@ SCR      : Execute a script.
 ```
 
 Example:  
+(please exchange everything with <....> by your values)  
 
 ```
 {
