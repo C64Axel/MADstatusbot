@@ -22,11 +22,13 @@ cd ~/MADstatusbot
 Create a Telegram Bot.  
 Copy config.json.example to config.json and do your configurations.  
 
-Start the bot with  
+Start the bot with:  
 ```
 cd ~/MADstatusbot
 ~/MADstatusbot_env/bin/python madstatus.py
 ```
+
+## Configuration: 
 
 Set the following parameters:  
 
