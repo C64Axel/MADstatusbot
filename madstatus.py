@@ -21,7 +21,8 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 #read config,locales
 with open ('config.json') as config_file:
 	config = json.load(config_file)
-msg_loc = json.load(open("locales/msg_" + config['language'] + ".json"))
+msg_loc = json.load(open("locales/msg_" + config['language'].lower() + ".json"))
+
 
 ##################
 # get bot information
