@@ -14,6 +14,10 @@ from time import sleep
 from urllib3.exceptions import InsecureRequestWarning
 from threading import Thread,currentThread
 
+##################
+# enable middleware Handler
+telebot.apihelper.ENABLE_MIDDLEWARE = True
+
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -50,7 +54,8 @@ def log(msg):
         logging.basicConfig(filename="log/" + botname + ".log", format="%(asctime)s|%(message)s", level=logging.INFO)
         logging.info(msg)
 
-telebot.apihelper.ENABLE_MIDDLEWARE = True
+##################
+# Log all messages send to the bot
 @bot.middleware_handler(update_types=['message'])
 def log_message(bot_instance, message):
 	log("Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
