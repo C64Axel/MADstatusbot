@@ -142,7 +142,7 @@ def check_action(wait,tgcorrelation,action):
 				else:
 					boxname = "global"
 
-				if boxname in action:
+				if boxname in action and origin['lastProtoDateTime']:
 					diff = int((time.mktime(time.localtime()) - origin['lastProtoDateTime']))/60
 
 											# reset if last action sucsessfull
@@ -216,11 +216,14 @@ def handle_status(message):
 	for instance in status:
 		for origin in instance:
 			if ("all" in chat_devices) or (origin['name'] in chat_devices):
-				diff = int((time.mktime(time.localtime()) - origin['lastProtoDateTime']))
-				if (diff / 60) < int(config['oktimeout']):
-					timediff = "OK"
+				if origin['lastProtoDateTime']:
+					diff = int((time.mktime(time.localtime()) - origin['lastProtoDateTime']))
+					if (diff / 60) < int(config['oktimeout']):
+						timediff = "OK"
+					else:
+						timediff = str(datetime.timedelta(seconds=diff))
 				else:
-					timediff = str(datetime.timedelta(seconds=diff))
+					timediff = "NONE"
 				msg_out = msg_out + "``` {:10} {:>8} {:17}\n```".format(origin['name'],timediff,origin['rmname'])
 	sendtelegram(chat_id,msg_out)
 
