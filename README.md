@@ -82,7 +82,7 @@ Example:
         "tgcorrelation": {
                         "<CHATID>": {
                                 "name": "SuperAdmin",
-				"verbose": "true",
+				"verbose": true,
                                 "box_origin": "all,allmsg"
                                 },
                         "<CHATID>": {
