@@ -107,7 +107,7 @@ def check_action(wait,tgcorrelation,action):
 		for chatid in tgcorrelation:
 			chat_devices = tgcorrelation[chatid]['box_origin']
 			if ("allmsg" in chat_devices) or (origin in chat_devices):
-				if not check_verbose or (check_verbose and (tgcorrelation[chatid].get('verbose','False').upper() == "TRUE")): 
+				if not check_verbose or (check_verbose and tgcorrelation[chatid].get('verbose',False)): 
 					log("Send message for {} to {}".format(origin,chatid))
 					sendtelegram(chatid,msg)
 
@@ -129,6 +129,7 @@ def check_action(wait,tgcorrelation,action):
 		cmd = cmd.replace("<ORIGIN>",origin)
 		p = subprocess.run(shlex.split(cmd))
 		log("CMD:{}".format(p))
+
 
 	lasttodo = {}
 	while True:

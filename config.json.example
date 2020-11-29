@@ -8,11 +8,11 @@
 			"<CHATID>": {
 				"name": "SuperAdmin",
 				"box_origin": "all,allmsg",
-				"verbose": "false"
+				"verbose": false
 				},
 			"<CHATID>": {
 				"name": "<NAME>",
-				"verbose": "true"
+				"verbose": true,
 				"box_origin": "all,<ORIGIN1>,<ORIGIN2>"
 				}
 			},
