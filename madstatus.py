@@ -23,8 +23,9 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 ##################
 #read config,locales
-with open ('config.json') as config_file:
-	config = json.load(config_file)
+f = open('config.json', "r")
+config = json.load(f)
+f.close()
 msg_loc = json.load(open("locales/msg_" + config['language'].lower() + ".json"))
 
 
@@ -37,7 +38,7 @@ try:
         botcallname = botident.first_name
         botid = botident.id
 except:
-        log("Error in Telegram. Can not find Botname and ID")
+        log("E|Error in Telegram. Can not find Botname and ID")
         quit()
 
 
@@ -58,7 +59,7 @@ def log(msg):
 # Log all messages send to the bot
 @bot.middleware_handler(update_types=['message'])
 def log_message(bot_instance, message):
-	log("Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
+	log("I|Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
 
 
 ##################
@@ -69,7 +70,23 @@ def sendtelegram(chatid,msg):
 		for text in splitted_text:
 			bot.send_message(chatid,text,parse_mode="markdown")
 	except:
-		log("ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
+		log("E|ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
+
+##################
+#
+def reloadconfig():
+	global config
+	while True:
+		f = open('config.json', "r")
+		try:
+			config_new = json.load(f)
+			config = config_new
+		except:
+			log("E|ERROR IN CONFIG FILE")
+		f.close()
+
+		sleep(60)
+
 
 ##################
 # Get Status from Server
@@ -92,14 +109,14 @@ def get_status():
 			r.sort(key=get_name)
 			status.append(r)
 		else:
-			log("Error getting status from {}".format(madmin_url))
+			log("W|Error getting status from {}".format(madmin_url))
 
 	return status
 
 
 ##################
 # check for Actions
-def check_action(wait,tgcorrelation,action):
+def check_action():
 
 	#################
 	# MSG
@@ -108,7 +125,7 @@ def check_action(wait,tgcorrelation,action):
 			chat_devices = tgcorrelation[chatid]['box_origin']
 			if ("allmsg" in chat_devices) or (origin in chat_devices):
 				if not check_verbose or (check_verbose and tgcorrelation[chatid].get('verbose',False)): 
-					log("Send message for {} to {}".format(origin,chatid))
+					log("I|Send message for {} to {}".format(origin,chatid))
 					sendtelegram(chatid,msg)
 
 	##################
@@ -120,7 +137,7 @@ def check_action(wait,tgcorrelation,action):
 		url = url.replace("<ORIGIN>",origin)
 		r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False)
 		if r.status_code !=  requests.codes.ok:
-			log("Error sending MADURL:{}:{}".format(madmin_url,r.status_code))
+			log("E|Error sending MADURL:{}:{}".format(madmin_url,r.status_code))
 		return(r.status_code)
 
 	##################
@@ -128,68 +145,74 @@ def check_action(wait,tgcorrelation,action):
 	def CMD(origin,cmd):
 		cmd = cmd.replace("<ORIGIN>",origin)
 		p = subprocess.run(shlex.split(cmd))
-		log("CMD:{}".format(p))
+		log("I|CMD:{}".format(p))
 
 
 	lasttodo = {}
 	while True:
 
 		status = get_status()
+		wait=int(config['actionwait'])
+		tgcorrelation=config['tgcorrelation']
+		action=config['action']
+		maintenance=config.get('maintenance', None)
 
-		for instancekey, instance in enumerate(status):
-			for origin in instance:
-				if origin['name'] in action:
-					boxname = origin['name']
-				else:
-					boxname = "global"
+		if maintenance:
+			log("W|Maintenacemode is active")
+		else:
+			for instancekey, instance in enumerate(status):
+				for origin in instance:
+					if origin['name'] in action:
+						boxname = origin['name']
+					else:
+						boxname = "global"
 
-				if boxname in action and origin['lastProtoDateTime']:
-					diff = int((time.mktime(time.localtime()) - origin['lastProtoDateTime']))/60
+					if boxname in action and origin['lastProtoDateTime']:
+						diff = int((time.mktime(time.localtime()) - origin['lastProtoDateTime']))/60
 
 											# reset if last action sucsessfull
-					if diff < int(list(action[boxname].keys())[0]) and origin['name'] in lasttodo and lasttodo[origin['name']] > 0:
-						log("{} set status to normal".format(origin['name']))
-						MSG(origin['name'],tgcorrelation,msg_loc["5"].format(origin['name']),False)
-						lasttodo[origin['name']] = 0
+						if diff < int(list(action[boxname].keys())[0]) and origin['name'] in lasttodo and lasttodo[origin['name']] > 0:
+							log("I|{} set status to normal".format(origin['name']))
+							MSG(origin['name'],tgcorrelation,msg_loc["5"].format(origin['name']),False)
+							lasttodo[origin['name']] = 0
 
-					try:						# try to read last todo index
-						last_todo = lasttodo[origin['name']]
-					except KeyError:				# restart: set last action for origin
-						last_todo = 0
-						try:
-							while diff >= int(list(action[boxname].keys())[last_todo + 1]):
-								last_todo += 1
+						try:						# try to read last todo index
+							last_todo = lasttodo[origin['name']]
+						except KeyError:				# restart: set last action for origin
+							last_todo = 0
+							try:
+								while diff >= int(list(action[boxname].keys())[last_todo + 1]):
+									last_todo += 1
+							except IndexError:
+								pass
+							lasttodo[origin['name']] = last_todo
+
+						try:						# send message if not last action
+							timeout = int(list(action[boxname].keys())[last_todo])
+
+							if diff >= timeout:
+								todo = list(action[boxname].values())[last_todo].upper().split(":")[0]
+
+								log("I|Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))
+
+								if todo == "MSG":
+									MSG(origin['name'],tgcorrelation,msg_loc["2"].format(origin['name'],diff),False)
+								elif todo == "MADURL":
+									url = list(action[boxname].values())[last_todo].split(":")[1]
+									MADURL(origin['name'],config['madmin_url'][instancekey],url)
+									MSG(origin['name'],tgcorrelation,msg_loc["4"].format(url,origin['name']),True)
+								elif todo == "SCR":
+									cmd = list(action[boxname].values())[last_todo].split(":")[1]
+									CMD(origin['name'],cmd)
+									MSG(origin['name'],tgcorrelation,msg_loc["6"].format(cmd,origin['name']),True)
+								else:
+									log("E|wrong action in {}".format(origin['name']))
+
+								lasttodo[origin['name']] += 1
 						except IndexError:
-							pass
-						lasttodo[origin['name']] = last_todo
-
-					try:						# send message if not last action
-						timeout = int(list(action[boxname].keys())[last_todo])
-
-						if diff >= timeout:
-							todo = list(action[boxname].values())[last_todo].upper().split(":")[0]
-
-							log("Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))
-
-							if todo == "MSG":
-								MSG(origin['name'],tgcorrelation,msg_loc["2"].format(origin['name'],diff),False)
-							elif todo == "MADURL":
-								url = list(action[boxname].values())[last_todo].split(":")[1]
-								MADURL(origin['name'],config['madmin_url'][instancekey],url)
-								MSG(origin['name'],tgcorrelation,msg_loc["4"].format(url,origin['name']),True)
-							elif todo == "SCR":
-								cmd = list(action[boxname].values())[last_todo].split(":")[1]
-								CMD(origin['name'],cmd)
-								MSG(origin['name'],tgcorrelation,msg_loc["6"].format(cmd,origin['name']),True)
-							else:
-								log("wrong action in {}".format(origin['name']))
-
-							lasttodo[origin['name']] += 1
-					except IndexError:
-						log("Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
-					except:
-						raise
-
+							log("I|Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
+						except:
+							raise
 		sleep(wait)
 
 
@@ -230,11 +253,15 @@ def handle_status(message):
 
 ####################################################################
 
-log("Bot {} started".format(botname))
-t = Thread(target=check_action, args=(int(config['actionwait']),config['tgcorrelation'],config['action']))
+log("I|Bot {} started".format(botname))
+c = Thread(target=reloadconfig, args=())
+c.setDaemon(True)
+c.start()
+
+t = Thread(target=check_action, args=())
 t.setDaemon(True)
 t.start()
 
-while True:
-	bot.polling(none_stop = False)
+#while True:
+bot.infinity_polling()
 

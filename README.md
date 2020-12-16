@@ -33,11 +33,12 @@ cd ~/MADstatusbot
 Set the following parameters:  
 
 ```
-apitoken   : The apitoken form your bot  
-madmin_url : Multiple Instances to get the madmin status Page. Split multiple URL's by ','  
-oktimeout  : Timeout after which /status shows the last data time  
-language   : Language of user messages  
-actionwait : Waiting time between checks  
+apitoken    : The apitoken form your bot  
+madmin_url  : Multiple Instances to get the madmin status Page. Split multiple URL's by ','  
+oktimeout   : Timeout after which /status shows the last data time  
+language    : Language of user messages  
+maintenance : don't do any action if true (default false)
+actionwait  : Waiting time between checks  
 
 tgcorrelation : Assign one chatid to one or multiple Oringins in MAD.  
                 Only this chatid can query the Status and get Messages from the origins listet in box_origin.  
@@ -69,6 +70,11 @@ SCR      : Execute a script.
 	   "SCR:/home/mad/utils/boxrestart.sh <ORIGIN>"
 ```
 
+These Parameters are reloaded every minute:
+
+oktimeout/actionwait/tgcorrelation/action
+
+
 Example:  
 (please exchange everything with <....> by your values)  
 
@@ -78,6 +84,7 @@ Example:
         "madmin_url" : ["<USER>:<PASSWORD>@http://127.0.0.1:5050"],
         "oktimeout" : 20,
         "language" : "de",
+        "maintenance" : false,
         "actionwait" : 60,
         "tgcorrelation": {
                         "<CHATID>": {
@@ -124,3 +131,9 @@ add verbose, allmsg and some new Messages
 ### 6. Okt 2020
 
 new action SCR
+
+### 16. Dez 2020
+
+reload config every minute so some parameter changes are dynamic
+
+Maintenancemode

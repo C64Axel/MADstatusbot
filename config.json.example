@@ -3,6 +3,7 @@
 	"madmin_url" : ["<USER>:<PASSWORD>@http://127.0.0.1:5050"],
 	"oktimeout" : 20,
 	"language" : "de",
+        "maintenance" : false,
 	"actionwait" : 60,
 	"tgcorrelation": {
 			"<CHATID>": {
