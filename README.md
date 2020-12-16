@@ -72,7 +72,7 @@ SCR      : Execute a script.
 
 These Parameters are reloaded every minute:
 
-oktimeout/actionwait/tgcorrelation/action
+oktimeout/actionwait/tgcorrelation/action/maintenance
 
 
 Example:  
@@ -135,5 +135,4 @@ new action SCR
 ### 16. Dez 2020
 
 reload config every minute so some parameter changes are dynamic
-
 Maintenancemode
