@@ -7,7 +7,6 @@ import time
 import requests
 import datetime
 import threading
-import shlex
 import subprocess
 
 from time import sleep
@@ -68,7 +67,13 @@ def sendtelegram(chatid,msg):
 	try:
 		splitted_text = telebot.util.split_string(msg,3000)
 		for text in splitted_text:
-			bot.send_message(chatid,text,parse_mode="markdown")
+			try:
+				bot.send_message(chatid,text,parse_mode="markdown")
+			except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+				log("W|ConnectionError - Sending again after 5 seconds!!!")
+				time.sleep(5)
+				bot.send_message(chatid,text,parse_mode="markdown")
+
 	except:
 		log("E|ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
 
@@ -80,7 +85,9 @@ def reloadconfig():
 		f = open('config.json', "r")
 		try:
 			config_new = json.load(f)
-			config = config_new
+			if config != config_new:
+				config = config_new
+				log("I|Config reloaded")
 		except:
 			log("E|ERROR IN CONFIG FILE")
 		f.close()
@@ -255,13 +262,10 @@ def handle_status(message):
 
 log("I|Bot {} started".format(botname))
 c = Thread(target=reloadconfig, args=())
-c.setDaemon(True)
 c.start()
 
 t = Thread(target=check_action, args=())
-t.setDaemon(True)
 t.start()
 
-#while True:
 bot.infinity_polling()
 
