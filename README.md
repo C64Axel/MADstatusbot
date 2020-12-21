@@ -134,5 +134,5 @@ new action SCR
 
 ### 16. Dez 2020
 
-reload config every minute so some parameter changes are dynamic
+reload config every minute so some parameter changes are dynamic  
 Maintenancemode
