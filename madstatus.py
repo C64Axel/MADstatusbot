@@ -8,6 +8,7 @@ import requests
 import datetime
 import threading
 import subprocess
+import shlex
 
 from time import sleep
 from urllib3.exceptions import InsecureRequestWarning
