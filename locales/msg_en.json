@@ -1,8 +1,9 @@
 {
 	"1" : "``` Device     lastData Route```\n",
 	"2" : "Your Device {} is out of sync for {:.0f} minutes and required a restart.",
-	"3" : "Your ID is not in the scannerlist. Please call an admin.",
+	"3" : "Your ID is not in the scannerlist. Please contact the admin.",
 	"4" : "MADURL ``` {} ``` startet for Device {}.",
 	"5" : "Status for Device {} ok again",
-	"6" : "Script ``` {} ``` executed for Device {}."
+	"6" : "Script ``` {} ``` executed for Device {}.",
+	"7" : "You don't have permission for {}. Please contact the admin."
 }
