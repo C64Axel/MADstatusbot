@@ -234,14 +234,21 @@ def handle_status(message):
 
 	chat_id=message.from_user.id
 
-	try:
-		chat_devices = message.text.split(" ")[1]
+	try:						# check correlation for catid
+		chat_devices = config['tgcorrelation'][str(chat_id)]['box_origin']
 	except:
-		try:
-			chat_devices = config['tgcorrelation'][str(chat_id)]['box_origin']
-		except:
-			sendtelegram(chat_id,msg_loc["3"])
+		sendtelegram(chat_id,msg_loc["3"])
+		return
+
+	try:
+		parameter = message.text.split(" ")[1]
+		if parameter in config['tgcorrelation'][str(chat_id)]['box_origin']:
+			chat_devices = parameter
+		else:
+			sendtelegram(chat_id,msg_loc["7"].format(parameter))
 			return
+	except:
+		pass
 
 	status = get_status()
 
