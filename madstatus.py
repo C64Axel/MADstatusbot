@@ -1,5 +1,6 @@
 import telebot
 import logging
+import logging.handlers
 import sys
 import json
 import io
@@ -14,15 +15,35 @@ from time import sleep
 from urllib3.exceptions import InsecureRequestWarning
 from threading import Thread,currentThread
 
+
+##################
+# Logging
+logfilename = 'log/madstatusbot.log'
+logger = logging.getLogger('madstatusbot')
+logger.setLevel(logging.INFO)
+
+logfile = logging.handlers.RotatingFileHandler(logfilename, maxBytes=5000000, backupCount=5)
+formatter = logging.Formatter('%(asctime)s|%(levelname)-8s|%(threadName)-15s|%(message)s')
+logfile.setFormatter(formatter)
+logger.addHandler(logfile)
+
+telebot.logger.setLevel(logging.INFO)
+telebot.logger.handlers=[]
+telebot.logger.addHandler(logfile)
+
+
 ##################
 # enable middleware Handler
 telebot.apihelper.ENABLE_MIDDLEWARE = True
 
+
+##################
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
+
 ##################
-#read config,locales
+# read config,locales
 f = open('config.json', "r")
 config = json.load(f)
 f.close()
@@ -31,35 +52,22 @@ msg_loc = json.load(open("locales/msg_" + config['language'].lower() + ".json"))
 
 ##################
 # get bot information
-bot = telebot.TeleBot(config['apitoken'],threaded=False)
+bot = telebot.TeleBot(config['apitoken'])
 try:
         botident = bot.get_me()
         botname = botident.username
         botcallname = botident.first_name
         botid = botident.id
 except:
-        log("E|Error in Telegram. Can not find Botname and ID")
+        logger.error("Error in Telegram. Can not find Botname and ID")
         quit()
 
-
-##################
-# Logging
-def my_excepthook(excType, excValue, traceback, logger=logging):
-    logging.error("Logging an uncaught exception",
-                 exc_info=(excType, excValue, traceback))
-sys.excepthook = my_excepthook
-threading.excepthook = my_excepthook
-
-def log(msg):
-        print (msg)
-        logging.basicConfig(filename="log/" + botname + ".log", format="%(asctime)s|%(message)s", level=logging.INFO)
-        logging.info(msg)
 
 ##################
 # Log all messages send to the bot
 @bot.middleware_handler(update_types=['message'])
 def log_message(bot_instance, message):
-	log("I|Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
+	logger.info("Message from ID:{}:{}:{}".format(message.from_user.id,message.from_user.username,message.text))
 
 
 ##################
@@ -71,12 +79,14 @@ def sendtelegram(chatid,msg):
 			try:
 				bot.send_message(chatid,text,parse_mode="markdown")
 			except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
-				log("W|ConnectionError - Sending again after 5 seconds!!!")
+				logger.warning("ConnectionError - Sending again after 5 seconds!!!")
 				time.sleep(5)
 				bot.send_message(chatid,text,parse_mode="markdown")
+			except:
+				raise
 
 	except:
-		log("E|ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
+		logger.error("ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
 
 ##################
 #
@@ -88,9 +98,9 @@ def reloadconfig():
 			config_new = json.load(f)
 			if config != config_new:
 				config = config_new
-				log("I|Config reloaded")
+				logger.info("Config reloaded")
 		except:
-			log("E|ERROR IN CONFIG FILE")
+			logger.error("ERROR IN CONFIG FILE")
 		f.close()
 
 		sleep(60)
@@ -111,13 +121,13 @@ def get_status():
 		madmin_up = url.split("@")[0]
 		madmin_url = url.split("@")[1]
 
-		r = requests.get(madmin_url + '/get_status', auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False)
+		r = requests.get(madmin_url + '/get_status', auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False, timeout=1)
 		if r.status_code == requests.codes.ok:
 			r = r.json()
 			r.sort(key=get_name)
 			status.append(r)
 		else:
-			log("W|Error getting status from {}".format(madmin_url))
+			logger.warning("Error getting status from {}".format(madmin_url))
 
 	return status
 
@@ -133,7 +143,7 @@ def check_action():
 			chat_devices = tgcorrelation[chatid]['box_origin']
 			if ("allmsg" in chat_devices) or (origin in chat_devices):
 				if not check_verbose or (check_verbose and tgcorrelation[chatid].get('verbose',False)): 
-					log("I|Send message for {} to {}".format(origin,chatid))
+					logger.info("Send message for {} to {}".format(origin,chatid))
 					sendtelegram(chatid,msg)
 
 	##################
@@ -143,9 +153,9 @@ def check_action():
 		madmin_url = instance.split("@")[1]
 
 		url = url.replace("<ORIGIN>",origin)
-		r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False)
+		r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False, timeout=1)
 		if r.status_code !=  requests.codes.ok:
-			log("E|Error sending MADURL:{}:{}".format(madmin_url,r.status_code))
+			logger.error("Error sending MADURL:{}:{}".format(madmin_url,r.status_code))
 		return(r.status_code)
 
 	##################
@@ -153,7 +163,7 @@ def check_action():
 	def CMD(origin,cmd):
 		cmd = cmd.replace("<ORIGIN>",origin)
 		p = subprocess.run(shlex.split(cmd))
-		log("I|CMD:{}".format(p))
+		logger.info("CMD:{}".format(p))
 
 
 	lasttodo = {}
@@ -166,7 +176,7 @@ def check_action():
 		maintenance=config.get('maintenance', None)
 
 		if maintenance:
-			log("W|Maintenacemode is active")
+			logger.warning("Maintenacemode is active")
 		else:
 			for instancekey, instance in enumerate(status):
 				for origin in instance:
@@ -180,7 +190,7 @@ def check_action():
 
 											# reset if last action sucsessfull
 						if diff < int(list(action[boxname].keys())[0]) and origin['name'] in lasttodo and lasttodo[origin['name']] > 0:
-							log("I|{} set status to normal".format(origin['name']))
+							logger.info("{} set status to normal".format(origin['name']))
 							MSG(origin['name'],tgcorrelation,msg_loc["5"].format(origin['name']),False)
 							lasttodo[origin['name']] = 0
 
@@ -193,7 +203,11 @@ def check_action():
 									last_todo += 1
 							except IndexError:
 								pass
+							except:
+								raise
 							lasttodo[origin['name']] = last_todo
+						except:
+							raise
 
 						try:						# send message if not last action
 							timeout = int(list(action[boxname].keys())[last_todo])
@@ -201,7 +215,7 @@ def check_action():
 							if diff >= timeout:
 								todo = list(action[boxname].values())[last_todo].upper().split(":")[0]
 
-								log("I|Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))
+								logger.info("Action:{}:{:.2f}:{}".format(origin['name'],diff,todo))
 
 								if todo == "MSG":
 									MSG(origin['name'],tgcorrelation,msg_loc["2"].format(origin['name'],diff),False)
@@ -214,11 +228,11 @@ def check_action():
 									CMD(origin['name'],cmd)
 									MSG(origin['name'],tgcorrelation,msg_loc["6"].format(cmd,origin['name']),True)
 								else:
-									log("E|wrong action in {}".format(origin['name']))
+									logger.error("wrong action in {}".format(origin['name']))
 
 								lasttodo[origin['name']] += 1
 						except IndexError:
-							log("I|Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
+							logger.info("Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
 						except:
 							raise
 		sleep(wait)
@@ -268,12 +282,12 @@ def handle_status(message):
 
 ####################################################################
 
-log("I|Bot {} started".format(botname))
-c = Thread(target=reloadconfig, args=())
-c.start()
+logger.info("Bot {} started".format(botname))
+t1 = Thread(name='loadconfig',target=reloadconfig, daemon=True, args=())
+t1.start()
 
-t = Thread(target=check_action, args=())
-t.start()
+t2 = Thread(name='checkaction',target=check_action, daemon=True, args=())
+t2.start()
 
-bot.infinity_polling()
+bot.polling()
 
