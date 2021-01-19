@@ -121,13 +121,17 @@ def get_status():
 		madmin_up = url.split("@")[0]
 		madmin_url = url.split("@")[1]
 
-		r = requests.get(madmin_url + '/get_status', auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False, timeout=1)
-		if r.status_code == requests.codes.ok:
-			r = r.json()
-			r.sort(key=get_name)
-			status.append(r)
-		else:
-			logger.warning("Error getting status from {}".format(madmin_url))
+		try:
+			r = requests.get(madmin_url + '/get_status', auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False, timeout=1)
+			if r.status_code == requests.codes.ok:
+				logger.info("Getting status from {}".format(madmin_url))
+				r = r.json()
+				r.sort(key=get_name)
+				status.append(r)
+			else:
+				logger.warning("Error getting status from {} Code: {}".format(madmin_url,r.status_code))
+		except:
+			logger.error("Timeout/Refused Error connecting to {}".format(madmin_url))
 
 	return status
 
@@ -155,7 +159,7 @@ def check_action():
 		url = url.replace("<ORIGIN>",origin)
 		try:
 			r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False, timeout=1)
-			if r.status_code !=  requests.codes.ok:
+			if r.status_code != requests.codes.ok:
 				logger.error("Error sending MADURL:{}:{}".format(madmin_url,r.status_code))
 			return(r.status_code)
 		except:
