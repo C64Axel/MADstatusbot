@@ -176,15 +176,14 @@ def check_action():
 	lasttodo = {}
 	while True:
 
-		status = get_status()
-		wait=int(config['actionwait'])
-		tgcorrelation=config['tgcorrelation']
-		action=config['action']
 		maintenance=config.get('maintenance', None)
+		wait=int(config['actionwait'])
 
-		if maintenance:
-			logger.warning("Maintenacemode is active")
-		else:
+		if not maintenance:
+			status = get_status()
+			tgcorrelation=config['tgcorrelation']
+			action=config['action']
+
 			for instancekey, instance in enumerate(status):
 				for origin in instance:
 					if origin['name'] in action:
@@ -242,6 +241,9 @@ def check_action():
 							logger.info("Action:{}:{:.0f}:last action reached".format(origin['name'],diff))
 						except:
 							raise
+		else:
+			logger.warning("Maintenacemode is active")
+
 		sleep(wait)
 
 
