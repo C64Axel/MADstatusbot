@@ -1,1 +1,1 @@
-pyTelegramBotAPI==3.7.5; python_version > '3'
+pyTelegramBotAPI~=3.7.5; python_version > '3'
