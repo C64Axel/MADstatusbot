@@ -73,12 +73,10 @@ def sendtelegram(chatid, msg):
         for text in splitted_text:
             try:
                 bot.send_message(chatid, text, parse_mode="markdown")
-            except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError, ConnectionError):
+            except (ConnectionAbortedError, ConnectionResetError, ConnectionRefusedError):
                 logger.warning("ConnectionError - Sending again after 5 seconds!!!")
                 time.sleep(5)
                 bot.send_message(chatid, text, parse_mode="markdown")
-            except:
-                raise
     except:
         logger.error("ERROR IN SENDING TELEGRAM MESSAGE TO {}".format(chatid))
 
@@ -206,8 +204,6 @@ def check_action():
                             except:
                                 raise
                             lasttodo[origin['name']] = last_todo
-                        except:
-                            raise
 
                         try:						# send message if not last action
                             timeout = int(list(action[boxname].keys())[last_todo])
@@ -233,8 +229,6 @@ def check_action():
                                 lasttodo[origin['name']] += 1
                         except IndexError:
                             logger.info("Action:{}:{:.0f}:last action reached".format(origin['name'], diff))
-                        except:
-                            raise
         else:
             logger.warning("Maintenacemode is active")
 
@@ -283,6 +277,10 @@ def handle_status(message):
                 msg_out = msg_out + "``` {:10} {:>8} {:17}\n```".format(origin['name'], timediff, origin['rmname'])
     sendtelegram(chat_id, msg_out)
 
+    if ("all" in chat_devices):
+        msg_out = "``` Thread loadconfig is {}\n Thread checkaction is {}```".format(t1.is_alive(),t2.is_alive())
+        sendtelegram(chat_id, msg_out)
+
 ####################################################################
 
 logger.info("Bot {} started".format(botname))
@@ -296,5 +294,3 @@ try:
     bot.infinity_polling()
 except KeyboardInterrupt:
     logger.info("Bot {} ended".format(botname))
-except Exception as e:
-    raise e
