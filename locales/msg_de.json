@@ -5,5 +5,6 @@
 	"4" : "MADURL ``` {} ``` für Box {} ausgeführt.",
 	"5" : "Status Box {} wieder OK.",
 	"6" : "Script ``` {} ``` für Box {} ausgeführt.",
-	"7" : "Du haste keine Berechtigung für {}. Bitte wende dich an den Admin."
+	"7" : "Du haste keine Berechtigung für {}. Bitte wende dich an den Admin.",
+	"8" : "Maintenace mode wurde auf {} gesetzt"
 }

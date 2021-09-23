@@ -89,10 +89,10 @@ def reloadconfig():
         try:
             f = open('config.json', "r")
             config_new = json.load(f)
+            f.close()
             if config != config_new:
                 config = config_new
                 logger.info("Config reloaded")
-                f.close()
         except:
             logger.error("ERROR IN CONFIG FILE")
 
@@ -169,7 +169,6 @@ def check_action():
     while True:
 
         maintenance = config.get('maintenance', None)
-        wait = int(config['actionwait'])
 
         if not maintenance:
             status = get_status()
@@ -232,7 +231,31 @@ def check_action():
         else:
             logger.warning("Maintenacemode is active")
 
-        time.sleep(wait)
+        time.sleep(int(config['actionwait']))
+
+
+##################
+# Handle maintenance
+@bot.message_handler(commands=['maint'])
+def handle_maint(message):
+
+    chat_id = message.from_user.id
+    maintainer = config.get('maintainer', "")
+
+    if str(chat_id) in maintainer:
+        maintenance = config.get('maintenance', None)
+        if maintenance:
+            config['maintenance'] = False
+        else:
+            config['maintenance'] = True
+
+        f = open('config.json', "w")
+        json.dump(config, f, indent=4)
+        f.close()
+
+        logger.info("{} set maintenace mode to {}".format(chat_id, config.get('maintenance', None)))
+
+        sendtelegram(chat_id, msg_loc["8"].format(config.get('maintenance', None)))
 
 
 ##################
@@ -278,12 +301,15 @@ def handle_status(message):
     sendtelegram(chat_id, msg_out)
 
     if ("all" in chat_devices):
-        msg_out = "``` Thread loadconfig is {}\n Thread checkaction is {}```".format(t1.is_alive(),t2.is_alive())
+        msg_out = "```Bot Status:\n Thread loadconfig  is {}\n Thread checkaction is {}\n Maintenance        is {}```".format(t1.is_alive(),t2.is_alive(),config.get('maintenance', None))
         sendtelegram(chat_id, msg_out)
 
 ####################################################################
 
 logger.info("Bot {} started".format(botname))
+
+tmpmaintenance = False
+
 t1 = Thread(name='loadconfig', target=reloadconfig, daemon=True, args=())
 t1.start()
 
