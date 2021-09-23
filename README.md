@@ -38,6 +38,7 @@ madmin_url  : Multiple Instances to get the madmin status Page. Split multiple U
 oktimeout   : Timeout after which /status shows the last data time  
 language    : Language of user messages  
 maintenance : don't do any action if true (default false)
+maintainer  : this chat id is allowed to change the maintenance mode
 actionwait  : Waiting time between checks  
 
 tgcorrelation : Assign one chatid to one or multiple Oringins in MAD.  
@@ -47,8 +48,7 @@ tgcorrelation : Assign one chatid to one or multiple Oringins in MAD.
                 "name" is only for your dokumentation and not used by the bot.  
 		"verbose" ist optional. Default is False. If set to True this Account get  
 			  more Messages like "MADURL ... startet for device xxxx"  
-			  
-             
+			             
 action        : Set multiple timeouts and their todo (please have a look at the example below )  
                 global  : this action is for origins with no special action entry  
                 timeout : n minutes  
@@ -56,9 +56,10 @@ action        : Set multiple timeouts and their todo (please have a look at the 
 ```
 
 ## Actions:
+The Bot will replace <ORIGIN> with the origin name.
 ```
 MSG      : Send a Message to all users who has an correlation to this origin.  
-MADURL   : Send this URL to the madmin instance. The Bot will replace <ORIGIN> whit the origin name.
+MADURL   : Send this URL to the madmin instance. 
            Example:
            "MADURL:/restart_phone?origin=<ORIGIN>&adb=False"  -> reboot the origin
            "MADURL:/clear_game_data?origin=<ORIGIN>&adb=False"  -> clear PoGo game data
@@ -72,7 +73,7 @@ SCR      : Execute a script.
 
 These Parameters are reloaded every minute:
 
-oktimeout/actionwait/tgcorrelation/action/maintenance
+oktimeout / actionwait / tgcorrelation / action / maintenance / maintainer
 
 
 Example:  
@@ -85,6 +86,7 @@ Example:
         "oktimeout" : 20,
         "language" : "de",
         "maintenance" : false,
+        "maintainer" : "<CHATID> <CHATID>"
         "actionwait" : 60,
         "tgcorrelation": {
                         "<CHATID>": {
@@ -114,8 +116,9 @@ Example:
 ```
 ## Commands for the bot:
 ```
-/status          : shows an overview of the "update time" of the origins assigned to the users chatid.
-/status <origin> : shows the "update time" of one origin.
+/status          : shows an overview of the "update time" for the origins assigned to the users chatid.
+/status <origin> : shows the "update time" for one origin.
+/maint           : toggles the maintanance mode (only for maintainer chat id)
 ```
 
 ## Changes
@@ -136,3 +139,7 @@ new action SCR
 
 reload config every minute so some parameter changes are dynamic  
 Maintenancemode
+
+### 23. Sep 2021
+
+set maintenance mode via bot command /maint
