@@ -264,7 +264,7 @@ def handle_maint(message):
 def handle_status(message):
 
     msg_out = msg_loc["1"]
-    msg_out = msg_out + "``` ---------- -------- ---------------\n```"
+    msg_out = msg_out + "``` ---------- -------- ---------------\n"
 
     chat_id = message.from_user.id
 
@@ -297,7 +297,8 @@ def handle_status(message):
                         timediff = str(datetime.timedelta(seconds=diff))
                 else:
                     timediff = "NONE"
-                msg_out = msg_out + "``` {:10} {:>8} {:17}\n```".format(origin['name'], timediff, origin['rmname'])
+                msg_out = msg_out + "{:10} {:>8} {:17}\n".format(origin['name'], timediff, origin['rmname'])
+    msg_out = msg_out + "```"
     sendtelegram(chat_id, msg_out)
 
     if ("all" in chat_devices):
