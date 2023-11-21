@@ -151,9 +151,9 @@ def check_action():
 
         url = url.replace("<ORIGIN>", origin)
         try:
-            r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False, timeout=1)
+            r = requests.get(madmin_url + url, auth=(madmin_up.split(":")[0], madmin_up.split(":")[1]), verify=False, timeout=10)
             if r.status_code != requests.codes.ok:
-                logger.error("Error sending MADURL:{}:{}".format(madmin_url, r.status_code))
+                logger.error("Error sending MADURL:{}:{}".format(madmin_url + url, r.status_code))
             return(r.status_code)
         except:
             pass
