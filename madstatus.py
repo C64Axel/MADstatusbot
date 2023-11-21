@@ -263,8 +263,8 @@ def handle_maint(message):
 @bot.message_handler(commands=['status'])
 def handle_status(message):
 
-    msg_out = msg_loc["1"]
-    msg_out = msg_out + "``` ---------- -------- ---------------\n"
+    msg_out = "```" + msg_loc["1"]
+    msg_out = msg_out + "---------- -------- ---------------\n"
 
     chat_id = message.from_user.id
 
