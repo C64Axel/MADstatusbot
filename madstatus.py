@@ -302,7 +302,7 @@ def handle_status(message):
     sendtelegram(chat_id, msg_out)
 
     if ("all" in chat_devices):
-        msg_out = "```Bot Status:\n Thread loadconfig  is {}\n Thread checkaction is {}\n Maintenance        is {}```".format(t1.is_alive(),t2.is_alive(),config.get('maintenance', None))
+        msg_out = "``` Bot Status:\n Thread loadconfig  is {}\n Thread checkaction is {}\n Maintenance        is {}```".format(t1.is_alive(),t2.is_alive(),config.get('maintenance', None))
         sendtelegram(chat_id, msg_out)
 
 ####################################################################
